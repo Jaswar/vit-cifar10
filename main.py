@@ -104,7 +104,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_freq', default=5)
     parser.add_argument('--checkpoint', default=None)
 
-    parser.add_argument('--patch_size', default=8)
+    parser.add_argument('--patch_size', default=4)
     parser.add_argument('--num_layers', default=7)
     parser.add_argument('--num_heads', default=12)
     parser.add_argument('--hidden_dim', default=384)
