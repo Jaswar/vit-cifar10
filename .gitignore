@@ -1,0 +1,5 @@
+data/
+out/
+logs/
+.idea/
+__pycache__/
