@@ -41,7 +41,7 @@ def main(args):
                 mlp_size=args.mlp_size,
                 dropout=args.dropout)
     optimizer = th.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999), weight_decay=args.decay)
-    loss_func = th.nn.CrossEntropyLoss()
+    loss_func = th.nn.CrossEntropyLoss(label_smoothing=args.smoothing)
     model = model.to(device)
 
     warmup_scheduler = th.optim.lr_scheduler.LambdaLR(optimizer,
@@ -110,6 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('--hidden_dim', default=384)
     parser.add_argument('--mlp_size', default=384)
     parser.add_argument('--dropout', default=0.2)
+    parser.add_argument('--smoothing', default=0.0)
 
     parser.add_argument('--lr', default=0.0003)
     parser.add_argument('--decay', default=5e-5)
