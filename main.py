@@ -12,6 +12,7 @@ from utils import train_epoch, val_epoch, plot_progress
 
 def main(args):
     device = 'cuda' if th.cuda.is_available() else 'cpu'
+    print(f'Using device: {device}')
 
     train_transform = tv.transforms.Compose([tv.transforms.RandomCrop(size=args.image_size, padding=4),
                                              # tv.transforms.Resize(size=(args.image_size, args.image_size)),
@@ -26,8 +27,8 @@ def main(args):
 
     # train_dataset = tv.datasets.ImageFolder(root='./data/imagenet-object-localization-challenge/ILSVRC/Data/CLS-LOC/train',
     #                                         transform=transform)
-    train_dataset = tv.datasets.CIFAR10(root='./data', train=True, transform=train_transform, download=True)
-    val_dataset = tv.datasets.CIFAR10(root='./data', train=False, transform=val_transform, download=True)
+    train_dataset = tv.datasets.CIFAR10(root=args.data_path, train=True, transform=train_transform, download=False)
+    val_dataset = tv.datasets.CIFAR10(root=args.data_path, train=False, transform=val_transform, download=False)
 
     train_loader = th.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
     val_loader = th.utils.data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
@@ -79,8 +80,8 @@ def main(args):
         lr_scheduler.step()
 
         if epoch % args.plot_freq == 0:
-            plot_progress('plot_train', train_losses, train_accuracies)
-            plot_progress('plot_val', val_losses, val_accuracies)
+            plot_progress('plot_train', train_losses, train_accuracies, args.out_path)
+            plot_progress('plot_val', val_losses, val_accuracies, args.out_path)
 
         # save model
         if epoch % args.save_freq == 0:
@@ -90,11 +91,14 @@ def main(args):
                 'optimizer': optimizer.state_dict(),
                 'lr_scheduler': lr_scheduler.state_dict()
             }
-            th.save(checkpoint, f'./logs/checkpoint_{epoch}.pth')
+            th.save(checkpoint, f'{args.out_path}/checkpoint_{epoch}.pth')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+
+    parser.add_argument('--data_path')
+    parser.add_argument('--out_path')
 
     parser.add_argument('--epochs', default=300)
     parser.add_argument('--batch_size', default=128)

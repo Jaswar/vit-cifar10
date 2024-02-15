@@ -81,10 +81,10 @@ def visualize_patches(unfolded, out='./out'):
             cv.imwrite(os.path.join(out, f'patch_{i}_{j}.png'), patch)
 
 
-def plot_progress(out, losses, accuracies):
+def plot_progress(out, losses, accuracies, out_path):
     xs = [x for x in range(len(losses))]
     plt.plot(xs, losses, label='loss')
     plt.plot(xs, accuracies, label='accuracy')
     plt.legend()
-    plt.savefig(f'./logs/{out}.png')
+    plt.savefig(f'{out_path}/{out}.png')
     plt.cla()
