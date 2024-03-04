@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 class SpatialTransformer(th.nn.Module):
 
-    def __init__(self, num_embeddings, embedding_size, hidden_dim=1024, *args, **kwargs):
+    def __init__(self, num_embeddings, embedding_size, hidden_dim=512, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.num_embeddings = num_embeddings - 1  # one less due to class token
         self.embedding_size = embedding_size

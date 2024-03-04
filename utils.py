@@ -26,7 +26,7 @@ def train_epoch(model, optimizer, loss_func, data_loader, device, start, epoch):
         optimizer.zero_grad()
         loss.backward()
 
-        th.nn.utils.clip_grad_norm_(model.parameters(), 1)
+        th.nn.utils.clip_grad_value_(model.parameters(), 1)
         optimizer.step()
 
         current_time = time.time()
