@@ -2,6 +2,7 @@ import torch as th
 from utils import visualize_patches
 import torch.nn.functional as F
 import math
+from stn import SpatialTransformer
 
 
 class SA(th.nn.Module):
@@ -58,8 +59,9 @@ class MSA(th.nn.Module):
 
 class TransformerEncoder(th.nn.Module):
 
-    def __init__(self, hidden_dim, num_heads, mlp_size, dropout, *args, **kwargs):
+    def __init__(self, num_embeddings, hidden_dim, num_heads, mlp_size, dropout, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.num_embeddings = num_embeddings
         self.hidden_dim = hidden_dim
         self.num_heads = num_heads
         self.mlp_size = mlp_size
@@ -77,6 +79,8 @@ class TransformerEncoder(th.nn.Module):
                                     th.nn.GELU(),
                                     th.nn.Dropout(self.dropout))
 
+        self.stn = SpatialTransformer(num_embeddings, hidden_dim)
+
     def forward(self, x):
         out = self.ln1(x)
         out = self.msa(out)
@@ -87,6 +91,9 @@ class TransformerEncoder(th.nn.Module):
         out = self.mlp(out)
 
         out = out + res_out
+
+        out = self.stn(out)
+
         return out
 
 
@@ -120,7 +127,7 @@ class ViT(th.nn.Module):
         self.projection = th.nn.Linear(self.patch_size * self.patch_size * self.num_channels, self.hidden_dim)
         self.cls_token = th.nn.Parameter(th.randn(1, 1, self.hidden_dim))
 
-        self.encoders = th.nn.ModuleList([TransformerEncoder(self.hidden_dim, self.num_heads, self.mlp_size, self.dropout)
+        self.encoders = th.nn.ModuleList([TransformerEncoder(n + 1, self.hidden_dim, self.num_heads, self.mlp_size, self.dropout)
                                           for _ in range(self.num_layers)])
 
         # MLP width: the width of the classification hidden layer: 3072, tanh activation
